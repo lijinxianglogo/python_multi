@@ -45,16 +45,28 @@ import time
 import ctypes
 import signal
 libc = ctypes.CDLL("libc.so.6")
-for i in range(2):
+def sig_hander(sig_num, acc_sig):
+    os.wait()
+    print "子进程退出"
+for i in range(1):
     print i
     pid = os.fork()
     if pid:
+        #不关心子进程是否退出,由系统的init接管，非阻塞
+        # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        #创建hander函数，子啊hander函数里面调用wait，非阻塞
+        # signal.signal(signal.SIGCHLD, sig_hander)
+        #自己调用wait，阻塞
+        # os.waitpid(pid, 0)
         print "父进程" + str(os.getpid())
+        time.sleep(1)
         #关于waitpid函数中的opion，当opion = WNOHANG时，没有收到子程序推出信息也会立即返回，用于定时检测子程序
         xx = os.waitpid(pid, 0)
     else:
         libc.prctl(1, signal.SIGINT)
-        print "子进程" + str(os.getpid())
         time.sleep(0.5)
+        print "子进程" + str(os.getpid())
+        #可以通过break控制子进程是否进入循环
+        break
 
 
