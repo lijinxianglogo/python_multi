@@ -2,6 +2,7 @@
 import os
 import time
 import paho.mqtt.client as mqtt
+import signal
 def on_connect(client, userdata, flags, rc):
     print "成功连接mqtt服务器"
     client.subscribe("chart")
@@ -18,6 +19,8 @@ client.connect("192.168.4.44", 1883, 60)
 #主进程用于监听topic和显示消息
 pid = os.fork()
 if pid:
+    #不关心子进程是否结束，由系统init进行回收
+    signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     #定义链接mqtt的回调函数，一般要连接的topic都是在这里连接
     client.on_connect = on_connect
     #定义收到消息时的回调函数
