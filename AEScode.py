@@ -1,36 +1,8 @@
 # _*_ coding:utf-8 _*_
-# import multiprocessing
-# import os
-# import time
-# '''
-# 进程池的使用，便于管理,启动之前要先close
-# '''
-# def pool_subprocess(i):
-#     print i
-#     print "子进程" + str(os.getpid())
-#     time.sleep(5)
-#
-# p = multiprocessing.Pool()
-# for i in range(4):
-#     p.apply_async(pool_subprocess, args=(i,))
-# p.close()
-# #用deamon来让子进程自动退出
-# # p.deamon = True
-# #用join来等待子进程
-# p.join()
-# time.sleep(1)
-# print "EXIT"
+
 #python本身是不支持二进制的，打印的时候默认是unicode的UTF-8编码,所以需要用unpack来解包
-def yy():
-    try:
-        with open("/home/ehigh/Downloads/fw_tag_v3.3.26_YS.HGbin", "r") as fp:
-            return fp.read(10)
-    except Exception, e:
-        print e
-        return False
 
 from Crypto.Cipher import AES
-import os
 class prpcrypt(object):
     def __init__(self, key, IV):
         #这里的密匙和IV默认为16字节128位的
@@ -81,20 +53,10 @@ class prpcrypt(object):
             return False
 
 
-pc = prpcrypt("HGKJ2014cryptkey", "hgkj2014CRYPTKEY")
-xx = pc.encrypt(yy())
-yy = pc.decrypt(xx)
-fw_path = "/home/ehigh/Downloads/en_fw.HGbin"
-fw_path1 = "/home/ehigh/Downloads/de_fw.HGbin"
-
-if os.path.exists(fw_path):
-    os.remove(fw_path)
-os.mknod(fw_path)
-with open(fw_path, 'ab') as fp:
-    fp.write(xx)
-
-if os.path.exists(fw_path1):
-    os.remove(fw_path1)
-os.mknod(fw_path1)
-with open(fw_path1, 'ab') as fp:
-    fp.write(yy)
+# data = {1:{'test1':9},2:{'test2':8}}
+# data1 = {3:{'test1':9},2:{'test2':66}}
+#
+# print dict(data.items()+ data1.items())
+data = [u'我', u'白', u'啊', u'中']
+print sorted(data)
+print '三十三'
