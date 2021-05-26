@@ -49,4 +49,5 @@ def ReadAndChangeJsonFile(proj, version):
         return False
 # data = ReadAndChangeJsonFile("ttt", "1.2.3.4")
 # data = {"error":"1.2.45.567"}
-writeJsonFile(data)
+
+print "{test}ddd".format(test = [123])

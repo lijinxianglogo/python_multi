@@ -1,19 +1,23 @@
 # _*_ coding:utf-8 _*_
 import pymysql
 import traceback
+import datetime
 import time
+import os
 from CSLog import CSLog
 CSLogger = CSLog("CSSQL", "./Log/CSSQL.log").getlogger()
 db_config_default = {
     'user': 'root',
     'password': 'eHIGH2014',
-    'host': 'localhost',
+    'host': '192.168.4.44',
     'port': 3306,
-    'dbname': 'lct_net_manager_test',
-    'dbcharset' : 'utf8',
+    'database': 'lct_net_manager',
+    'charset': 'utf8',
     'use_unicode': True,
     'throw_alarm': True
 }
+
+
 class CSSQL(object):
     __instance = None
     @classmethod
@@ -28,9 +32,9 @@ class CSSQL(object):
             self.host = db_config['host']
             self.user = db_config['user']
             self.password = db_config['password']
-            self.database = db_config['dbname']
+            self.database = db_config['database']
             self.port = db_config['port']
-            self.charset = db_config['dbcharset']
+            self.charset = db_config['charset']
             self.use_unicode = db_config["use_unicode"]
             self.connection = None
             self.connectSQL()
@@ -123,6 +127,11 @@ class CSSQL(object):
             return None
 
     def delete(self, table, condition=None, limit=None, order=None, desc=False, commit=True):
+        # type: (object, object, object, object, object, object) -> object
+        """
+
+        :rtype: 
+        """
         condition = self.condition(condition)
         limits = "LIMIT {limit}".format(limit=limit) if limit else ""
         if desc:
@@ -175,14 +184,14 @@ class CSSQL(object):
             result = cursor.fetchone()
             if result:
                 for key in result:
-                    if isinstance(type(result[key]), type(datetime.datetime(2016, 5, 9, 20, 57, 10))):
+                    if isinstance(result[key], type(datetime.datetime(2016, 5, 9, 20, 57, 10))):
                         result[key] = str(result[key])
         else:
             result = cursor.fetchall()
             if result:
                 for i in range(0, len(result)):
                     for key in result[i]:
-                        if isinstance(type(result[key]), type(datetime.datetime(2016, 5, 9, 20, 57, 10))):
+                        if isinstance(result[i][key], type(datetime.datetime(2016, 5, 9, 20, 57, 10))):
                             result[i][key] = str(result[i][key])
         return result
 
@@ -229,16 +238,3 @@ class CSSQL(object):
             sql = condition
 
         return sql
-
-dbconn = CSSQL.getInstance(db_config_default)
-# in_data = {}
-# in_data["product_sn"] = "ljxtest"
-# in_data["product_id"] = 0
-# for i in range(10):
-#     in_data["product_sn"] += str(i)
-#     in_data["product_id"] = i*10
-#     print dbconn.insert(table="tb_fw_mgt", data=in_data)
-# dbconn.delete(table="tb_fw_mgt", order="product_sn", desc=True, limit=2)
-# dbconn.update(table="tb_fw_mgt", data={"product_sn": "ljxok"}, limit=2)
-cursor = dbconn.executecSQL("SELECT default(product_id), default(product_sn) FROM tb_fw_mgt LIMIT 1", recursor=True)
-print cursor.fetchall()

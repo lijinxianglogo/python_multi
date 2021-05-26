@@ -1,83 +1,5 @@
-# _*_ coding:utf-8 _*_
-import xlwt
-import xlrd
-import os
+# # -*- encoding: utf-8 -*-
 import math
-import traceback
-
-
-class ExcelOpera(object):
-    # 参数:dir_path：文件夹路径,file_name：EXCEL文件名,sheet_index:EXCEL的表的索引
-    def __init__(self, dir_path, file_name, sheet_index=0, sheet_name="sheet2"):
-        self.sheet_index = sheet_index
-        self.path = dir_path + file_name
-        self.sheet_name = sheet_name
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-        if not os.path.exists(self.path):
-            book = xlwt.Workbook(encoding='utf-8')
-            book.add_sheet(self.sheet_name, True)
-            book.save(self.path)
-
-    @staticmethod
-    def __open_excel(file_name):
-        try:
-            data = xlrd.open_workbook(file_name)
-            return data
-        except Exception, e:
-            print (traceback.format_exc())
-            print (e)
-            return False
-
-    # 根据索引获取Excel表格中的数据   colnameindex：表头列名所在行的索引
-    def excel_table_read(self, colnameindex=0):
-        try:
-            result = {}
-            data = self.__open_excel(self.path)
-            if data is not False:
-                table = data.sheets()[self.sheet_index]
-                nrows = table.nrows  # 行数
-                if nrows:
-                    colnames = table.row_values(colnameindex)  # 某一行数据
-                    for colname in colnames:
-                        result[colname] = []
-                    for index in range(1, nrows):
-                        row_datas = table.row_values(index)
-                        if row_datas:
-                            for i in range(len(row_datas)):
-                                result[colnames[i]].append(row_datas[i])
-            return result
-        except Exception, e:
-            print (traceback.format_exc())
-            print (e)
-            return False
-
-    def excel_table_write(self, data):
-        try:
-            # 得到当前excel中的数据
-            old_datas = self.excel_table_read()
-            # 根据数据类型往里面添加数据
-            data_keys = data.keys()
-            for data_key in data_keys:
-                if data_key in old_datas:
-                    old_datas[data_key] += data[data_key]
-                else:
-                    old_datas[data_key] = data[data_key]
-            # excel op
-            file_op = xlwt.Workbook()
-            sheet = file_op.add_sheet(self.sheet_name, True)
-            data_keys = old_datas.keys()
-            for index in range(len(data_keys)):
-                sheet.write(0, index, data_keys[index])
-                v = old_datas[data_keys[index]]
-                for i in range(len(v)):
-                    sheet.write(i + 1, index, v[i])
-            file_op.save(self.path)
-            return True
-        except Exception, e:
-            print (traceback.format_exc())
-            print (e)
-            return False
 
 
 class UwbCoordToGps(object):
@@ -94,7 +16,7 @@ class UwbCoordToGps(object):
                         x: float(x坐标),
                         y: float(y坐标)}
         """
-        # 纬度每变化一度的实际距离,单位米0
+        # 纬度每变化一度的实际距离,单位米
         self.latitude_per = 110880
         # 经度每变化一度的实际距离,单位米
         self.longitude_per = 110880 * math.cos(point_0['latitude'] * math.pi / 180)
@@ -124,7 +46,7 @@ class UwbCoordToGps(object):
         # UWB距离
         uwb_dis = math.sqrt((point_1['x'] - point_0['x']) ** 2 + (point_1['y'] - point_0['y']) ** 2)
         # 两个点同时进行微调
-        print l_and_l_dis - uwb_dis
+        print(l_and_l_dis - uwb_dis)
         adjust_value = (l_and_l_dis - uwb_dis) / 2.0
         if point_1['x'] == point_0['x']:
             # 对y坐标微调
@@ -226,14 +148,93 @@ class UwbCoordToGps(object):
 
 
 p0 = {'longitude': 104.135872972222, 'latitude': 30.3178330555556, 'x': 0, 'y': 0}
+
 p1 = {'longitude': 104.1357671864, 'latitude': 30.3177029120, 'x': -17.715, 'y': -0.056}
-coord_change = UwbCoordToGps(p0, p1)
-excel_op = ExcelOpera('./', 'test_result.xlsx')
-excel_data = excel_op.excel_table_read()
-result = {'pos_x': [], 'pos_y': []}
-for index in range(len(excel_data['GpsLongitude'])):
-    uwb_data = coord_change.calc_lon_lat_to_uwb(excel_data['GpsLongitude'][index], excel_data['GpsLatitude'][index])
-    result['pos_x'].append(uwb_data['x'])
-    result['pos_y'].append(uwb_data['y'])
-print result
-# excel_op.excel_table_write(result)
+xx = UwbCoordToGps(p0, p1)
+p0 = {'longitude': 107.010915, 'latitude': 41.057112, 'x': -16.13, 'y': -160.25}
+
+p1 = {'longitude': 107.005207, 'latitude': 41.056227, 'x': -656.59, 'y': -156.94}
+p2 = {'longitude': 107.01013, 'latitude': 41.060109, 'x': -9.92, 'y': 294.92}
+xx = UwbCoordToGps(p0, p1)
+# print xx.calc_uwb_to_lon_lat(65.23, 12.56)
+# print xx.calc_uwb_to_lon_lat(198.96, 14.44)
+# print xx.calc_lon_lat_to_uwb(p2['longitude'], p2['latitude'])
+# print xx.calc_lon_lat_to_uwb(p3['longitude'], p3['latitude'])
+#
+#
+#
+#
+#
+#
+#
+# import struct
+# # import pymysql
+# # connection = pymysql.connect(host='localhost',
+# #                              port=3306,
+# #                              user='root',
+# #                              password='eHIGH2014',
+# #                              db='country_info',
+# #                              charset='utf8',
+# #                              use_unicode=True,
+# #                              # binary_prefix=True,
+# #                              cursorclass=pymysql.cursors.DictCursor)
+#
+# # with connection.cursor() as cursor:
+# #     sql = "insert into test (pwd) values (%s)"
+# #     for i in range(10):
+# #         dd = struct.pack('<H10s', i, 'sss')
+# #         args = (bytearray(dd))
+# #         cursor.execute(sql, args)
+# #     connection.commit()
+#     # sql = "create table tb_house(pk_house_id int(4) not null, \
+#     #                              house_name varchar(64) not null default '-', \
+#     #                              house_zone int(11) not null)\
+#     #        engine=innodb charset=utf8 partition by range(house_zone)(\
+#     #            partition p0 values less than (20),\
+#     #            partition p1 values less than (40),\
+#     #            partition p2 values less than (60),\
+#     #            partition p3 values less than maxvalue\
+#     #        );"
+#     # cursor.execute(sql)
+#     # connection.commit()
+#
+# # import os, sys
+# # import time
+# # import signal
+# # import ctypes
+# # libc = ctypes.CDLL('libc.so.6')
+# # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+# # 后台运行
+#
+# # def daemon():
+# #     global num
+# #     # signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+# #     pid = os.fork()
+# #     if pid:
+# #         sys.exit(0)
+# #     else:
+# #         # # 子进程默认继承父进程的umask（文件权限掩码），重设为0（完全控制），以免影响程序读写文件
+# #         os.umask(0)
+# #         # # 让子进程成为新的会话组长和进程组长
+# #         os.setsid()
+# #         # # 刷新缓冲区先，小心使得万年船
+# #         sys.stdout.flush()
+# #         sys.stderr.flush()
+# #         # dup2函数原子化地关闭和复制文件描述符，重定向到/dev/nul，即丢弃所有输入输出
+# #         with open('/dev/null') as read_null, open('/dev/null', 'w') as write_null:
+# #             os.dup2(read_null.fileno(), sys.stdin.fileno())
+# #             os.dup2(write_null.fileno(), sys.stdout.fileno())
+# #             os.dup2(write_null.fileno(), sys.stderr.fileno())
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
+print(ord('e'))
+

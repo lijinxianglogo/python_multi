@@ -13,36 +13,37 @@ def TCPClient():
     # 设置select的监听列表
     rlist = [sk]
     while True:
-        # sk.sendall(str(os.getpid()))
+        sk.sendall(str(os.getpid()))
         c_rlist, c_wlist, c_xlist = select.select(rlist, [], [], 1)
         for c_read in c_rlist:
             if c_read == sk:
                 data = sk.recv(1024)
                 if len(data):
-                    print len(data)
+                    print(len(data))
                 else:
-                    print len(data)
+                    print(len(data))
                     exit(1)
 
-
+import time
 def UDPClient():
     # UDP: 基于非连接的通讯
     #recvfrom和sendto
     # 创建UDP套接字
     sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     # 设置非阻塞模式
-    sk.setblocking(1)
+    sk.setblocking(0)
     #服务器地址
     sk_address = ('127.0.0.1', 9566)
+    sk.sendto(b'', sk_address)
     while True:
-        send_data = raw_input(':')
-        sk.sendto(send_data, sk_address)
         # 调用select监听
         rlist = [sk]
-        c_rlist, c_wlist, c_xlist = select.select(rlist, [], [], 1)
+        c_rlist, c_wlist, c_xlist = select.select(rlist, [], [],1)
         for c_read in c_rlist:
             if c_read == sk:
                 data, address = sk.recvfrom(1024)
-                print address, data
+                print( address, data.decode())
+        sk.recvfrom(1024)
+        print(121212)
 
-TCPClient()
+# UDPClient()

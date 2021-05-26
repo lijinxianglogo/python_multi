@@ -31,4 +31,3 @@ class CSLog(object):
 
     def getlogger(self):
         return self.logger
-
